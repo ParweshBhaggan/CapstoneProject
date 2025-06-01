@@ -2,4 +2,4 @@ ipykernel
 pandas
 scikit-learn
 matplotlib
-matplotlib notebook
+notebook
