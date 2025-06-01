@@ -17,8 +17,7 @@ Follow these steps to get started:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-group/private-breast-cancer-classifier.git
-cd private-breast-cancer-classifier
+git clone https://github.com/ParweshBhaggan/CapstoneProject.git
 ```
 
 ### 2. Create a Python Environment
