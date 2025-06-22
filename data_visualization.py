@@ -2,11 +2,19 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import LabelEncoder
+
 
 
 class DataVisualizer:
-    def __init__(self, file_path):
-        self.df = pd.read_csv(file_path)
+    def __init__(self, file_path=None, ml_service=None):
+        if ml_service:
+            self.df = ml_service.df.copy()
+        elif file_path:
+            self.df = pd.read_csv(file_path)
+        else:
+            raise ValueError("Provide either a file_path or an ml_service instance.")
 
     
     #Clinical Data Visuals
@@ -107,3 +115,43 @@ class DataVisualizer:
         plt.grid(False)
         plt.tight_layout()
         plt.show()
+    
+    def plot_pca_projection(self):
+        from sklearn.decomposition import PCA
+        from sklearn.preprocessing import LabelEncoder
+
+        df_encoded = self.df.copy()
+        for col in ['gender', 'ESR1', 'PGR', 'ERBB2']:
+            if df_encoded[col].dtype == 'object':
+                le = LabelEncoder()
+                df_encoded[col] = le.fit_transform(df_encoded[col])
+
+        target_encoder = LabelEncoder()
+        df_encoded['subtype_encoded'] = target_encoder.fit_transform(df_encoded['subtype'])
+
+        X = df_encoded[['gender', 'age', 'ESR1', 'PGR', 'ERBB2']]
+        y = target_encoder.inverse_transform(df_encoded['subtype_encoded'])
+
+        from sklearn.decomposition import PCA
+        pca = PCA(n_components=2)
+        X_pca = pca.fit_transform(X)
+
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        pca_df = pd.DataFrame(X_pca, columns=['PC1', 'PC2'])
+        pca_df['Subtype'] = y
+
+        plt.figure(figsize=(8, 6))
+        for subtype in pca_df['Subtype'].unique():
+            subset = pca_df[pca_df['Subtype'] == subtype]
+            plt.scatter(subset['PC1'], subset['PC2'], label=subtype, alpha=0.7)
+
+        plt.title("PCA Projection of Clinical Features")
+        plt.xlabel("Principal Component 1")
+        plt.ylabel("Principal Component 2")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.show()
+

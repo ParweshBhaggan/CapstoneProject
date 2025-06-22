@@ -81,6 +81,7 @@ class MenuController:
             print("6. Plot Model F1 Scores")
             print("7. Plot Feature Importances (Random Forest)")
             print("8. Plot Confusion Matrix (Best Model)")
+            print("9. PCA Projection of Clinical Features")  # 👈 NEW
             print("0. Back to main menu")
 
             choice = input("Enter your choice: ").strip()
@@ -92,14 +93,51 @@ class MenuController:
             elif choice == '3':
                 self.visualizer.plot_feature_distributions()
             elif choice == '4':
-                col = input("Enter feature name (e.g., ERBB2): ").strip().upper()
-                self.visualizer.plot_feature_vs_age(col)
+                print("\nSelect Feature to Plot Against Age:")
+                options = {'1': 'gender', '2': 'ESR1', '3': 'PGR', '4': 'ERBB2'}
+                for k, v in options.items():
+                    print(f"{k}. {v}")
+                print("0. Back")
+                selection = input("Enter your choice: ").strip()
+                feature = options.get(selection)
+                if feature:
+                    self.visualizer.plot_feature_vs_age(feature)
+                elif selection != '0':
+                    print("Invalid choice.")
             elif choice == '5':
-                x = input("X-axis (e.g., age): ").strip().lower()
-                y = input("Y-axis (e.g., ERBB2): ").strip().upper()
+                print("\nSelect X-axis feature:")
+                x_options = {'1': 'age', '2': 'gender', '3': 'ESR1', '4': 'PGR', '5': 'ERBB2'}
+                for k, v in x_options.items():
+                    print(f"{k}. {v}")
+                print("0. Back")
+                x_sel = input("X-axis choice: ").strip()
+                x = x_options.get(x_sel)
+
+                if x is None and x_sel != '0':
+                    print("Invalid X-axis choice.")
+                    continue
+                elif x_sel == '0':
+                    continue
+
+                print("\nSelect Y-axis feature:")
+                y_options = {'1': 'age', '2': 'gender', '3': 'ESR1', '4': 'PGR', '5': 'ERBB2'}
+                for k, v in y_options.items():
+                    print(f"{k}. {v}")
+                print("0. Back")
+                y_sel = input("Y-axis choice: ").strip()
+                y = y_options.get(y_sel)
+
+                if y is None and y_sel != '0':
+                    print("Invalid Y-axis choice.")
+                    continue
+                elif y_sel == '0':
+                    continue
+
                 self.visualizer.plot_grouped_scatter(x, y, group_by='subtype')
             elif choice == '6':
-                self.visualizer.plot_model_scores({k: v['score'] for k, v in self.ml_service.tuned_model_scores.items()})
+                self.visualizer.plot_model_scores(
+                    {k: v['score'] for k, v in self.ml_service.tuned_model_scores.items()}
+                )
             elif choice == '7':
                 model = self.ml_service.models.get("Random Forest (Tuned)")
                 if model:
@@ -113,11 +151,14 @@ class MenuController:
                     self.ml_service.y,
                     self.ml_service.target.classes_
                 )
+            elif choice == '9':  # 👈 NEW
+                self.visualizer.plot_pca_projection()
             elif choice == '0':
                 break
             else:
                 print("Invalid option.")
             input("\nPress ENTER to return...")
+
 
     def main_menu(self):
         while True:
