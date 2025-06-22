@@ -195,7 +195,7 @@ class MachineLearningService:
         if self.best_model_name:
             y_pred = self.best_model.predict(self.X)
             f1 = f1_score(self.y, y_pred, average='weighted')
-            print(f"\n🏆 Best Model: {self.best_model_name} with F1 (weighted) = {f1:.4f}")
+            print(f"\nBest Model: {self.best_model_name} with F1 (weighted) = {f1:.4f}")
         else:
             print("No best model has been selected yet.")
 
